@@ -275,6 +275,29 @@ static int32_t msm_flash_i2c_init(
 	flash_ctrl->power_info.power_down_setting_size =
 		flash_ctrl->power_setting_array.size_down;
 
+	rc = msm_camera_fill_vreg_params(
+			flash_ctrl->power_info.cam_vreg,
+			flash_ctrl->power_info.num_vreg,
+			flash_ctrl->power_info.power_setting,
+			flash_ctrl->power_info.power_setting_size);
+	if (rc < 0) {
+		pr_err("%s:%d failed in camera_fill_vreg_params  rc %d",
+				__func__, __LINE__, rc);
+		return rc;
+	}
+
+	/* Parse and fill vreg params for powerdown settings*/
+	rc = msm_camera_fill_vreg_params(
+		flash_ctrl->power_info.cam_vreg,
+		flash_ctrl->power_info.num_vreg,
+		flash_ctrl->power_info.power_down_setting,
+		flash_ctrl->power_info.power_down_setting_size);
+	if (rc < 0) {
+		pr_err("%s:%d failed msm_camera_fill_vreg_params for PDOWN rc %d",
+			__func__, __LINE__, rc);
+		return rc;
+}
+
 	if ((flash_ctrl->power_info.power_setting_size > MAX_POWER_CONFIG) ||
 	(flash_ctrl->power_info.power_down_setting_size > MAX_POWER_CONFIG)) {
 		pr_err("%s:%d invalid power setting size=%d size_down=%d\n",
@@ -995,6 +1018,8 @@ static int32_t msm_flash_get_dt_data(struct device_node *of_node,
 	struct msm_flash_ctrl_t *fctrl)
 {
 	int32_t rc = 0;
+	struct msm_camera_power_ctrl_t *power_info =
+		&fctrl->power_info;
 
 	CDBG("called\n");
 
@@ -1050,6 +1075,15 @@ static int32_t msm_flash_get_dt_data(struct device_node *of_node,
 		fctrl->flash_driver_type = FLASH_DRIVER_GPIO;
 	CDBG("%s:%d fctrl->flash_driver_type = %d", __func__, __LINE__,
 		fctrl->flash_driver_type);
+
+	/* Read the regulator information from device tree */
+	rc = msm_camera_get_dt_vreg_data(of_node, &power_info->cam_vreg,
+			&power_info->num_vreg);
+	if (rc < 0) {
+		pr_err("%s:%d msm_camera_get_dt_vreg_data failed rc %d\n",
+			__func__, __LINE__, rc);
+		return rc;
+	}
 
 	return rc;
 }
