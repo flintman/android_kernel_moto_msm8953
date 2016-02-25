@@ -115,6 +115,7 @@ micron	Micron Technology Inc.
 mitsubishi	Mitsubishi Electric Corporation
 mosaixtech	Mosaix Technologies, Inc.
 moxa	Moxa
+motosh  Motorola Sensorhub
 mpl	MPL AG
 mundoreader	Mundo Reader S.L.
 murata	Murata Manufacturing Co., Ltd.
@@ -177,6 +178,7 @@ spansion	Spansion Inc.
 st	STMicroelectronics
 ste	ST-Ericsson
 stericsson	ST-Ericsson
+stm     STMicroelectronics
 synaptics	Synaptics, Inc.
 synology	Synology, Inc.
 thine	THine Electronics, Inc.
