@@ -902,6 +902,7 @@
 		qcom,pull = <5>;		/* No pull  */
 		qcom,vin-sel = <2>;		/* VIN0 */
 		qcom,src-sel = <0>;		/* GPIO */
+		qcom,out-strength = <2>;        /* Medium */
 		qcom,master-en = <1>;		/* Enable GPIO */
 		status = "okay";
 	};
@@ -911,6 +912,7 @@
 		qcom,pull = <5>;		/* No pull  */
 		qcom,vin-sel = <2>;		/* VIN0 */
 		qcom,src-sel = <0>;		/* GPIO */
+		qcom,out-strength = <2>;        /* Medium */
 		qcom,master-en = <1>;		/* Enable GPIO */
 		status = "okay";
 	};
@@ -920,6 +922,7 @@
 		qcom,pull = <5>;		/* No pull  */
 		qcom,vin-sel = <2>;		/* VIN0 */
 		qcom,src-sel = <0>;		/* GPIO */
+		qcom,out-strength = <2>;        /* Medium */
 		qcom,master-en = <1>;		/* Enable GPIO */
 		status = "okay";
 	};
@@ -929,6 +932,7 @@
 		qcom,pull = <5>;		/* No pull  */
 		qcom,vin-sel = <2>;		/* VIN0 */
 		qcom,src-sel = <0>;		/* GPIO */
+		qcom,out-strength = <2>;        /* Medium */
 		qcom,master-en = <1>;		/* Enable GPIO */
 		status = "okay";
 	};
