@@ -2593,7 +2593,8 @@ static int dwc3_msm_power_set_property_usb(struct power_supply *psy,
 			if (mdwc->vbus_active || test_bit(ID, &mdwc->inputs)) {
 				pm_stay_awake(mdwc->dev);
 				queue_delayed_work(mdwc->dwc3_resume_wq,
-					&mdwc->resume_work, 0);
+					&mdwc->resume_work,
+					msecs_to_jiffies(0));
 			}
 		}
 		break;
