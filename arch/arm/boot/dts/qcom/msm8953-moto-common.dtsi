@@ -1232,6 +1232,10 @@
 	};
 };
 
+&pmi8950_vadc {
+	/delete-node/ chan@d;
+};
+
 &slim_msm {
 	status = "ok";
 	/delete-node/ tasha_codec;
