@@ -199,6 +199,7 @@ void platform_set_data_role(FSC_BOOL PolicyIsDFP);
 
 FSC_S32 platform_set_usb_device_enable(FSC_BOOL blnEnable);
 
+void platform_set_usb_host_enable(FSC_BOOL blnEnable);
 void platform_run_wake_thread(void);
 typedef enum {
 	fsa_lpm = 0,
