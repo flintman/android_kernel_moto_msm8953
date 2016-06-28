@@ -247,8 +247,7 @@ fusb_Delay10us(delayCount);
 ******************************************************************************/ 
 void platform_notify_cc_orientation(CC_ORIENTATION orientation) 
 {
-	
-	    // Optional: Notify platform of CC orientation
+	fusb302_cc = orientation;
 } 
  
 
