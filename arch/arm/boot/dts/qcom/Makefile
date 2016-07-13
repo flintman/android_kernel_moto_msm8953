@@ -269,7 +269,9 @@ dtb-$(CONFIG_ARCH_MSM8953) += msm8953-sim.dtb \
 	msm8953-iot-mtp.dtb \
 	apq8053-iot-mtp.dtb
 
-dtb-$(CONFIG_ARCH_MSM8953) += msm8953-potter-p0a.dtb
+dtb-$(CONFIG_ARCH_MSM8953) += msm8953-potter-p0a.dtb \
+	msm8953-potter-p1a.dtb \
+	msm8953-potter-p1b.dtb
 
 dtb-$(CONFIG_ARCH_SDM450) += sdm450-rcm.dtb \
 	sdm450-cdp.dtb \
