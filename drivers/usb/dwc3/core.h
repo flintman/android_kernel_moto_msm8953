@@ -986,6 +986,7 @@ struct dwc3 {
 	wait_queue_head_t	wait_linkstate;
 	int			last_fifo_depth;
 	unsigned		xhci_limit_arbitrary_sg:1;
+	unsigned		xhci_panic_on_wdog:1;
 };
 
 /* -------------------------------------------------------------------------- */
