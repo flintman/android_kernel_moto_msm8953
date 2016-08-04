@@ -2831,10 +2831,12 @@ static int dwc3_msm_power_set_property_usb(struct power_supply *psy,
 
 		/* Ignore requests from EXT if USBC has ownership */
 		if (mdwc->usb_owner == PSY_USB_OWNER_USBC &&
-				val->intval == PSY_USB_OWNER_EXT)
+				(val->intval == PSY_USB_OWNER_EXT_2 ||
+				val->intval == PSY_USB_OWNER_EXT_3))
 			break;
 
-		if (mdwc->usb_owner == PSY_USB_OWNER_EXT &&
+		if ((mdwc->usb_owner == PSY_USB_OWNER_EXT_2 ||
+				mdwc->usb_owner == PSY_USB_OWNER_EXT_3) &&
 				val->intval == PSY_USB_OWNER_USBC) {
 			/* Disconnect EXT if USB C has claimed ownership */
 			dbg_event(dwc->ctrl_num, 0xFF, "owner change", 0);
