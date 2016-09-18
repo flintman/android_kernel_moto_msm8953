@@ -20,17 +20,7 @@
 	qcom,board-id = <0x44 0x81b0>;
 };
 
-&cdc_1p2v {
-	/delete-property/ gpio;
-	gpio = <&tlmm 126 0>;
+&pm8953_diangu_dig {
+	qcom,cdc-boost-pdm-clk;
 };
 
-&cdc_1p2_en_default {
-	mux {
-		pins = "gpio126";
-	};
-
-	config {
-		pins = "gpio126";
-		};
-};
