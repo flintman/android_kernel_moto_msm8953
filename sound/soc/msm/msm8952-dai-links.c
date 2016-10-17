@@ -2054,7 +2054,7 @@ struct snd_soc_card *populate_snd_card_dailinks(struct device *dev)
 		msm8952_dai_links = msm8952_tasha_dai_links;
 	}
 #ifdef CONFIG_SND_SOC_MARLEY
-	else if (!strcmp(card->name, "msm8952-marley-card")) {
+	else if (!strncmp(card->name, "msm8952-marley-card")) {
 		int len_2a, len_2b;
 		len1 = ARRAY_SIZE(msm8952_common_fe_dai);
 		len2 = len1 + ARRAY_SIZE(msm8952_marley_fe_dai);
