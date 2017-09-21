@@ -4192,8 +4192,6 @@ static void glink_core_channel_cleanup(struct glink_core_xprt_ctx *xprt_ptr)
 	spin_lock_irqsave(&dummy_xprt_ctx->xprt_ctx_lock_lhb1, d_flags);
 	spin_lock_irqsave(&xprt_ptr->xprt_ctx_lock_lhb1, flags);
 
-	list_for_each_entry_safe(ctx, tmp_ctx, &xprt_ptr->channels,
-						port_list_node) {
 		rwref_write_get_atomic(&ctx->ch_state_lhb2, true);
 		if (ctx->local_open_state == GLINK_CHANNEL_OPENED ||
 			ctx->local_open_state == GLINK_CHANNEL_OPENING) {

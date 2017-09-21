@@ -16,6 +16,7 @@
 #include <linux/pm.h>
 #include <linux/slab.h>
 #include <linux/idr.h>
+#include <linux/alarmtimer.h>
 #include <linux/of_device.h>
 #include <linux/qpnp/power-on.h>
 #include <linux/spmi.h>

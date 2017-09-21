@@ -883,7 +883,6 @@ void StateMachineAttachedSource(void)
 		if ((CCTermPrevious == CCTypeOpen) && (!IsPRSwap))	// If the debounced CC pin is detected as open and we aren't in the middle of a PR_Swap
 		{
 			platform_set_usb_host_enable(FALSE);
-
 #ifdef FSC_HAVE_DRP
 			if ((PortType == USBTypeC_DRP) && blnSrcPreferred)	// Check to see if we need to go to the TryWait.SNK state...
 				SetStateTryWaitSink();
@@ -1548,10 +1547,9 @@ void SetStateAttachWaitAccessory(void)
 #ifdef FSC_HAVE_SRC
 void SetStateAttachedSource(void)
 {
-
 	Registers.Mask.M_COMP_CHNG = 0;
 	DeviceWrite(regMask, 1, &Registers.Mask.byte);
-
+	platform_set_usb_host_enable(TRUE);
 	platform_set_vbus_lvl_enable(VBUS_LVL_5V, TRUE, TRUE);	// Enable only the 5V output
 	ConnState = AttachedSource;	// Set the state machine variable to Attached.Src
 	TypeCSubState = 0;
@@ -1566,7 +1564,6 @@ void SetStateAttachedSource(void)
 	platform_toggleAudioSwitch(fsa_usb_mode);
 	usbc_psy.type = POWER_SUPPLY_TYPE_USBC_SRC;
 	power_supply_changed(&usbc_psy);
-	platform_set_usb_host_enable(TRUE);
 }
 #endif // FSC_HAVE_SRC
 
@@ -1662,12 +1659,7 @@ void RoleSwapToAttachedSource(void)
 	PDDebounceTimer = tPDDebounce;	// Set the debounce timer to tPDDebounceMin for detecting a detach
 	CCDebounceTimer = tCCDebounce;	// Disable the 2nd level debouncing, not needed in this state                                      // Disable the toggle timer, not used in this state
 	PDFilterTimer = T_TIMER_DISABLE;	// Disable PD filter timer
-	platform_enableSuperspeedUSB(blnCCPinIsCC1, blnCCPinIsCC2);
 	platform_toggleAudioSwitch(fsa_usb_mode);
-#ifdef CONFIG_FSUSB42_MUX
-	if (fsusb42_get_state() != FSUSB_STATE_EXT)
-		fsusb42_set_state(FSUSB_STATE_USB);
-#endif
 	usbc_psy.type = POWER_SUPPLY_TYPE_USBC_SRC;
 	power_supply_changed(&usbc_psy);
 	platform_set_usb_host_enable(TRUE);

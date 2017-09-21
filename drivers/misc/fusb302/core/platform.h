@@ -196,9 +196,7 @@ void platform_notify_unsupported_accessory(void);
 *                  a data role swap.
 *******************************************************************************/
 void platform_set_data_role(FSC_BOOL PolicyIsDFP);
-
 FSC_S32 platform_set_usb_device_enable(FSC_BOOL blnEnable);
-
 void platform_set_usb_host_enable(FSC_BOOL blnEnable);
 void platform_run_wake_thread(void);
 typedef enum {
@@ -208,5 +206,5 @@ typedef enum {
 	fsa_audio_override
 } FSASwitchState;
 void platform_toggleAudioSwitch(FSASwitchState state);
-
+FSC_BOOL platform_has_big_switch(void);
 #endif // _FSC_PLATFORM_H_

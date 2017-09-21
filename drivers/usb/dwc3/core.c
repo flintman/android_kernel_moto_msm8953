@@ -784,8 +784,6 @@ static int dwc3_probe(struct platform_device *pdev)
 	u8			hird_threshold;
 	u32			num_evt_buffs;
 	u32			core_id;
-	static u8		ctrl_number;
-
 	int			ret;
 
 	void __iomem		*regs;
