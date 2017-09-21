@@ -108,14 +108,6 @@ struct tzdbg_reset_info_t {
 	uint32_t reset_cnt;	/* Number of resets occured/CPU */
 };
 
-/* warm boot reason for cores */
-struct tzbsp_diag_wakeup_info_t {
-	/* Wake source info : APCS_GICC_HPPIR */
-	uint32_t HPPIR;
-	/* Wake source info : APCS_GICC_AHPPIR */
-	uint32_t AHPPIR;
-};
-
 /*
  * Interrupt Info Table
  */
