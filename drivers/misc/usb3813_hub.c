@@ -70,7 +70,6 @@ struct usb3813_info {
 	bool   mod_enabled;
 	struct usb_ext_status ext_state;
 	struct delayed_work usb3813_enable_work;
-	bool   controller_enabled;
 	bool   factory_mode;
 };
 
@@ -227,9 +226,10 @@ static int usb3813_device_enable(struct usb3813_info *info, bool enable)
 	dev_dbg(info->dev, "%s - enable = %d\n", __func__, enable);
 
 	if (enable) {
-		power_supply_set_usb_owner(usb_psy, PSY_USB_OWNER_EXT);
-		/* If EXT took ownership, switch to host mode */
-		if (power_supply_get_usb_owner(usb_psy) == PSY_USB_OWNER_EXT) {
+		/* Device mode is supported only over the USB3 i/f */
+		power_supply_set_usb_owner(usb_psy, PSY_USB_OWNER_EXT_3);
+		/* If EXT took ownership, switch to device mode */
+		if (power_supply_get_usb_owner(usb_psy) == PSY_USB_OWNER_EXT_3) {
 			power_supply_set_supply_type(usb_psy,
 					POWER_SUPPLY_TYPE_USB);
 			power_supply_set_present(usb_psy, 1);
@@ -251,26 +251,30 @@ static int usb3813_2_0_host_enable(struct usb3813_info *info, bool enable)
 
 	dev_dbg(info->dev, "%s - enable = %d\n", __func__, enable);
 
-	if (info->enable_controller && !info->controller_enabled && enable) {
+	if (info->enable_controller) {
 
 		/* Enable Dedicated Controller Only Once */
 		usb_psy = power_supply_get_by_name("usb_host");
 		if (!usb_psy)
 			return -ENODEV;
-		power_supply_set_usb_otg(usb_psy,
-				POWER_SUPPLY_USB_OTG_ENABLE_DATA);
+
+		if (enable)
+			power_supply_set_usb_otg(usb_psy,
+					POWER_SUPPLY_USB_OTG_ENABLE_DATA);
+		else
+			power_supply_set_usb_otg(usb_psy,
+					POWER_SUPPLY_USB_OTG_DISABLE);
 
 		power_supply_put(usb_psy);
-		info->controller_enabled = true;
 	} else if (info->switch_controller) {
 		usb_psy = info->usb_psy;
 
 		if (enable) {
-			/* Set the owner to EXT */
-			power_supply_set_usb_owner(usb_psy, PSY_USB_OWNER_EXT);
+			/* Set the owner to EXT_2 since this is a USB2 host */
+			power_supply_set_usb_owner(usb_psy, PSY_USB_OWNER_EXT_2);
 			/* If EXT took ownership, switch to host mode */
 			if (power_supply_get_usb_owner(usb_psy) ==
-						PSY_USB_OWNER_EXT)
+						PSY_USB_OWNER_EXT_2)
 				power_supply_set_usb_otg(usb_psy,
 					POWER_SUPPLY_USB_OTG_ENABLE_DATA);
 			else
@@ -293,11 +297,11 @@ static int usb3813_3_1_host_enable(struct usb3813_info *info, bool enable)
 	dev_dbg(info->dev, "%s - enable = %d\n", __func__, enable);
 
 	if (enable) {
-		/* Set the owner to EXT */
-		power_supply_set_usb_owner(usb_psy, PSY_USB_OWNER_EXT);
+		/* Set the owner to USB3 */
+		power_supply_set_usb_owner(usb_psy, PSY_USB_OWNER_EXT_3);
 		/* If EXT took ownership, switch to host mode */
 		if (power_supply_get_usb_owner(usb_psy) ==
-					PSY_USB_OWNER_EXT)
+					PSY_USB_OWNER_EXT_3)
 			power_supply_set_usb_otg(usb_psy,
 				POWER_SUPPLY_USB_OTG_ENABLE_DATA);
 		else
@@ -367,46 +371,6 @@ static void usb3813_send_uevent(struct usb3813_info *info)
 	kfree(env);
 }
 
-#define MAX_LPM_WAIT_COUNT 100
-static void usb3813_wait_for_controller_lpm(struct usb3813_info *info)
-{
-	struct power_supply *usb_psy;
-	union power_supply_propval prop = {0,};
-	int rc, count = 0;
-
-	if (!info->enable_controller)
-		return;
-
-	dev_dbg(info->dev, "%s\n", __func__);
-	usb_psy = power_supply_get_by_name("usb_host");
-	if (!usb_psy)
-		return;
-
-	prop.intval = 0;
-
-	while (!prop.intval && count < MAX_LPM_WAIT_COUNT &&
-						info->mod_enabled) {
-		rc = usb_psy->get_property(usb_psy,
-				POWER_SUPPLY_PROP_USB_LPM,
-				&prop);
-		if (rc < 0) {
-			dev_err(info->dev, "Unable to read lpm for usb_host\n");
-			break;
-		}
-
-		/* Exit wait if the host is in lpm */
-		if (prop.intval)
-			break;
-		msleep(20);
-		count++;
-	}
-
-	if (count >= MAX_LPM_WAIT_COUNT)
-		dev_err(info->dev, "Timed out waiting for usb_host lpm\n");
-
-	power_supply_put(usb_psy);
-}
-
 static int usb3813_hub_attach(struct usb3813_info *info, bool enable)
 {
 	if (enable == info->hub_enabled)
@@ -418,8 +382,6 @@ static int usb3813_hub_attach(struct usb3813_info *info, bool enable)
 	info->hub_enabled = enable;
 
 	if (info->hub_enabled) {
-		usb3813_wait_for_controller_lpm(info);
-
 		if (clk_prepare_enable(info->hub_clk)) {
 			dev_err(info->dev, "%s: failed to prepare clock\n",
 				__func__);
@@ -767,13 +729,10 @@ static int usb3813_validate_ext_params(struct usb_ext_status *status)
 			return -EINVAL;
 	} else if (status->proto == USB_EXT_PROTO_3_1) {
 		/*
-		 * We support only Enterprise as the path for
-		 * USB 3.1 Ext Class, however both USB hosts and
+		 * For USB 3.1 Ext Class, both USB hosts and
 		 * peripherals are supported.
 		 */
-		if (status->path != USB_EXT_PATH_ENTERPRISE)
-			return -EINVAL;
-		else if (status->type == USB_EXT_REMOTE_UNKNOWN)
+		if (status->type == USB_EXT_REMOTE_UNKNOWN)
 			return -EINVAL;
 	} else
 		return -EINVAL;
@@ -832,10 +791,10 @@ static int psy_notifier_call(struct notifier_block *nb,
 	bool usb_present;
 	bool work = 0;
 
-	if (val != PSY_EVENT_PROP_CHANGED)
+	if (val != PSY_EVENT_PROP_CHANGED || !psy)
 		return NOTIFY_OK;
 
-	if (ignore_typec || !psy || (psy != info->usb_psy))
+	if (ignore_typec || psy != info->usb_psy)
 		return NOTIFY_OK;
 
 	/* We don't care about usb events if a mod is not attached */
