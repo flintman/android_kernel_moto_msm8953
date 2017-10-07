@@ -1,0 +1,53 @@
+[1mdiff --cc Makefile[m
+[1mindex f57e82c,779986d..0000000[m
+[1m--- a/Makefile[m
+[1m+++ b/Makefile[m
+[36m@@@ -709,45 -712,6 +741,48 @@@[m [mifdef CONFIG_KCO[m
+    endif[m
+  endif[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +ifeq ($(cc-name),clang)[m
+[32m +ifneq ($(CROSS_COMPILE),)[m
+[32m +CLANG_TARGET	:= -target $(notdir $(CROSS_COMPILE:%-=%))[m
+[32m +GCC_TOOLCHAIN	:= $(realpath $(dir $(shell which $(LD)))/..)[m
+[32m +endif[m
+[32m +ifneq ($(GCC_TOOLCHAIN),)[m
+[32m +CLANG_GCC_TC	:= -gcc-toolchain $(GCC_TOOLCHAIN)[m
+[32m +endif[m
+[32m +KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)[m
+[32m +KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)[m
+[32m +KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)[m
+[32m +KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)[m
+[32m +KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)[m
+[32m +KBUILD_CFLAGS += $(call cc-disable-warning, gnu)[m
+[32m +KBUILD_CFLAGS += $(call cc-disable-warning, pointer-bool-conversion)[m
+[32m +KBUILD_CFLAGS += $(call cc-disable-warning, address-of-packed-member)[m
+[32m +KBUILD_CFLAGS += $(call cc-disable-warning, duplicate-decl-specifier)[m
+[32m +KBUILD_CFLAGS += -Wno-asm-operand-widths[m
+[32m +KBUILD_CFLAGS += -Wno-initializer-overrides[m
+[32m +KBUILD_CFLAGS += -fno-builtin[m
+[32m +[m
+[32m +# Quiet clang warning: comparison of unsigned expression < 0 is always false[m
+[32m +[m
+[32m +KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)[m
+[32m +# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the[m
+[32m +# source of a reference will be _MergedGlobals and not on of the whitelisted names.[m
+[32m +# See modpost pattern 2[m
+[32m +KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)[m
+[32m +KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)[m
+[32m +KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)[m
+[32m +else[m
+[32m +[m
+[32m +KBUILD_CFLAGS += $(call cc-option,-fno-delete-null-pointer-checks,)[m
+[32m +# These warnings generated too much noise in a regular build.[m
+[32m +# Use make W=1 to enable them (see scripts/Makefile.build)[m
+[32m +KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)[m
+[32m +KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)[m
+[32m +endif[m
+[32m +[m
+[32m++=======[m
+[32m++>>>>>>> 4a30339... BACKPORT: kbuild: Set KBUILD_CFLAGS before incl. arch Makefile[m
+  ifdef CONFIG_FRAME_POINTER[m
+  KBUILD_CFLAGS	+= -fno-omit-frame-pointer -fno-optimize-sibling-calls[m
+  else[m
