@@ -161,6 +161,4 @@ obj-$(CONFIG_PMBUS)		+= pmbus/
 
 ccflags-$(CONFIG_HWMON_DEBUG_CHIP) := -DDEBUG
 
-#TODO: remove me b/62058353
-subdir-ccflags-y += \
-	-Wno-enum-conversion
+CFLAGS_qpnp-adc-voltage.o := $(call cc-disable-warning, enum-conversion)

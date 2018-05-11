@@ -30,7 +30,4 @@ obj-$(CONFIG_PERCPU_RWSEM) += percpu-rwsem.o
 obj-$(CONFIG_QUEUE_RWLOCK) += qrwlock.o
 obj-$(CONFIG_LOCK_TORTURE_TEST) += locktorture.o
 
-subdir-ccflags-y += \
-	-Wno-gcc-compat
-
 subdir-ccflags-y += $(call cc-disable-warning, gcc-compat)
