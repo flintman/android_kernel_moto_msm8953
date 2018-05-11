@@ -32,3 +32,5 @@ obj-$(CONFIG_LOCK_TORTURE_TEST) += locktorture.o
 
 subdir-ccflags-y += \
 	-Wno-gcc-compat
+
+subdir-ccflags-y += $(call cc-disable-warning, gcc-compat)
